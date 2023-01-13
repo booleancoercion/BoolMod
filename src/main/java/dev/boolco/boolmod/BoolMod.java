@@ -2,6 +2,7 @@ package dev.boolco.boolmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import eu.pb4.stylednicknames.NicknameHolder;
 
 import static net.minecraft.server.command.CommandManager.*;
 
@@ -24,6 +27,8 @@ public class BoolMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        boolean isStyledNicknamesLoaded = FabricLoader.getInstance().isModLoaded("styled-nicknames");
+
         CommandRegistrationCallback.EVENT
                 .register((dispatcher, dedicated) -> dispatcher.register(literal("list").then(literal("json")
                         .executes(context -> {
@@ -42,7 +47,11 @@ public class BoolMod implements ModInitializer {
                             for (ServerPlayerEntity player : players) {
                                 JsonObject playerObject = new JsonObject();
                                 playerObject.addProperty("name", player.getName().asString());
+                                if (isStyledNicknamesLoaded) {
+                                    playerObject.addProperty("nickname", NicknameHolder.of(player).sn_get());
+                                }
                                 playerObject.addProperty("uuid", player.getUuidAsString());
+
                                 arr.add(playerObject);
                             }
 
