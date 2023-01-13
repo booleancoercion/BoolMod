@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.text.LiteralText;
 
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public class BoolMod implements ModInitializer {
                                 playerObject.addProperty("name", player.getName().asString());
                                 if (isStyledNicknamesLoaded) {
                                     playerObject.addProperty("nickname", NicknameHolder.of(player).sn_get());
+                                    playerObject.add("nickname_styled", Text.Serializer.toJsonTree(NicknameHolder.of(player).sn_getOutput()));
                                 }
                                 playerObject.addProperty("uuid", player.getUuidAsString());
 
