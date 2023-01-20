@@ -45,7 +45,9 @@ dependencies {
 	modImplementation include("eu.pb4:player-data-api:0.1.0+1.18")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
-    modImplementation include("maven.modrinth:styled-nicknames:1.0.4+1.18.1")
+	modCompileOnly include("maven.modrinth:styled-nicknames:1.0.4+1.18.1")
+
+    compileOnly 'me.lucko:spark-api:0.1-SNAPSHOT'
 }
 
 processResources {

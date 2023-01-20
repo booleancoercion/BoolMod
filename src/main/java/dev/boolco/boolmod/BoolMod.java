@@ -15,9 +15,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import eu.pb4.stylednicknames.NicknameHolder;
+import me.lucko.spark.api.Spark;
+import me.lucko.spark.api.SparkProvider;
+import me.lucko.spark.api.statistic.StatisticWindow;
+import me.lucko.spark.api.statistic.StatisticWindow.TicksPerSecond;
+import me.lucko.spark.api.statistic.types.DoubleStatistic;
 
 import static net.minecraft.server.command.CommandManager.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class BoolMod implements ModInitializer {
@@ -26,9 +32,12 @@ public class BoolMod implements ModInitializer {
     // That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger("boolmod");
 
+    private Spark spark = null;
+
     @Override
     public void onInitialize() {
         boolean isStyledNicknamesLoaded = FabricLoader.getInstance().isModLoaded("styled-nicknames");
+        boolean isSparkLoaded = FabricLoader.getInstance().isModLoaded("spark");
 
         CommandRegistrationCallback.EVENT
                 .register((dispatcher, dedicated) -> dispatcher.register(literal("list").then(literal("json")
@@ -40,9 +49,7 @@ public class BoolMod implements ModInitializer {
                             obj.addProperty("max_players", server.getMaxPlayerCount());
 
                             List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
-                            players.sort((player1, player2) -> {
-                                return player1.getName().asString().compareTo(player2.getName().asString());
-                            });
+                            players.sort(Comparator.comparing(player -> player.getName().asString()));
 
                             JsonArray arr = new JsonArray();
                             for (ServerPlayerEntity player : players) {
@@ -58,6 +65,23 @@ public class BoolMod implements ModInitializer {
                             }
 
                             obj.add("list", arr);
+
+                            if (isSparkLoaded) {
+                                if (spark == null) {
+                                    spark = SparkProvider.get();
+                                }
+
+                                DoubleStatistic<StatisticWindow.TicksPerSecond> tps = spark.tps();
+                                assert tps != null;
+                                JsonArray tpsArray = new JsonArray();
+
+                                for (TicksPerSecond window : TicksPerSecond.values()) {
+                                    double polled = tps.poll(window);
+                                    tpsArray.add(Math.round(polled * 100) / 100.0);
+                                }
+
+                                obj.add("tps", tpsArray);
+                            }
 
                             context.getSource().sendFeedback(
                                     new LiteralText(obj.toString()),
