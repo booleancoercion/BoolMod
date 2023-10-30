@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -39,15 +39,9 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation include(fabricApi.module("fabric-api-base", project.fabric_version))
 	modImplementation include(fabricApi.module("fabric-lifecycle-events-v1", project.fabric_version))
-	modImplementation include(fabricApi.module("fabric-command-api-v1", project.fabric_version))
+	modImplementation include(fabricApi.module("fabric-command-api-v2", project.fabric_version))
 
-	modImplementation include("eu.pb4:placeholder-api:1.1.3+1.17.1")
-	modImplementation include("eu.pb4:player-data-api:0.1.0+1.18")
-	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
-
-	modCompileOnly include("maven.modrinth:styled-nicknames:1.0.4+1.18.1")
-
-    compileOnly 'me.lucko:spark-api:0.1-SNAPSHOT'
+	modCompileOnly("maven.modrinth:styled-nicknames:1.2.1+1.20")
 }
 
 processResources {
